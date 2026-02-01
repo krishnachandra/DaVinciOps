@@ -11,7 +11,7 @@ export async function Navbar() {
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <Link href="/" className="flex-shrink-0 flex items-center">
-                            <span className="text-xl font-bold text-slate-800 tracking-tight">Project<span className="text-blue-600">Board</span></span>
+                            <span className="text-xl font-bold text-slate-800 tracking-tight">DaVinci<span className="text-blue-600">Ops</span></span>
                         </Link>
                     </div>
                     <div className="flex items-center space-x-4">
