@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { CreateProjectButton } from '@/components/CreateProjectButton';
+import { ProjectList } from '@/components/ProjectList';
 
 export default async function DashboardPage() {
     const session = await getSession();
@@ -10,9 +12,21 @@ export default async function DashboardPage() {
     let projects;
     if (session.role === 'ADMIN') {
         projects = await prisma.project.findMany({
-            include: {
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                imageUrl: true,
+                createdAt: true,
                 _count: {
                     select: { tasks: true },
+                },
+                users: {
+                    select: {
+                        id: true,
+                        username: true,
+                        role: true,
+                    }
                 },
             },
             orderBy: { createdAt: 'desc' },
@@ -26,14 +40,30 @@ export default async function DashboardPage() {
                     },
                 },
             },
-            include: {
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                imageUrl: true,
+                createdAt: true,
                 _count: {
                     select: { tasks: true },
+                },
+                users: {
+                    select: {
+                        id: true,
+                        username: true,
+                        role: true,
+                    }
                 },
             },
             orderBy: { createdAt: 'desc' },
         });
     }
+
+    const allUsers = await prisma.user.findMany({
+        orderBy: { username: 'asc' },
+    });
 
     return (
         <div>
@@ -42,39 +72,27 @@ export default async function DashboardPage() {
                     <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Projects</h1>
                     <p className="text-slate-500 mt-1">Select a project to view its board</p>
                 </div>
-                {/* Add Project Button could go here */}
+                <CreateProjectButton currentUser={session.username as string} users={allUsers} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.map((project) => (
-                    <Link
-                        key={project.id}
-                        href={`/projects/${project.id}`}
-                        className="block group"
-                    >
-                        <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md hover:border-blue-300 transition-all duration-200 h-full flex flex-col">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18" /></svg>
-                                </div>
-                                <span className="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-full font-medium">
-                                    {project._count.tasks} Tasks
-                                </span>
-                            </div>
-                            <h3 className="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
-                                {project.name}
-                            </h3>
-                            <p className="text-slate-500 text-sm line-clamp-2 mb-4 flex-grow">
-                                {project.description || 'No description provided.'}
-                            </p>
-                            <div className="text-xs text-slate-400 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                <span>Last updated just now</span>
-                                <span className="group-hover:translate-x-1 transition-transform">→</span>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
+            <ProjectList
+                projects={projects.map(p => ({
+                    ...p,
+                    imageUrl: p.imageUrl,
+                    _count: p._count,
+                    users: p.users.map(u => ({
+                        id: u.id,
+                        username: u.username,
+                        role: u.role
+                    }))
+                }))}
+                session={{
+                    id: session.id as string,
+                    role: session.role as string,
+                    username: session.username as string
+                }}
+                allUsers={allUsers}
+            />
 
             {projects.length === 0 && (
                 <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">

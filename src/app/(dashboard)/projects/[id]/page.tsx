@@ -37,6 +37,7 @@ export default async function ProjectPage({
             ...t,
             createdAt: t.createdAt.toISOString(),
             updatedAt: t.updatedAt.toISOString(),
+            completedAt: t.completedAt ? t.completedAt.toISOString() : null,
         })),
     };
 
