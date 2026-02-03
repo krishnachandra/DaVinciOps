@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updateProject } from '@/app/actions';
+import { ImageUpload } from './ImageUpload';
 
 type Project = {
     id: string;
@@ -24,7 +25,7 @@ export function EditProjectModal({
 }) {
     const [name, setName] = useState(project.name);
     const [description, setDescription] = useState(project.description || '');
-    const [imageUrl, setImageUrl] = useState(project.imageUrl || '');
+    const [imageUrl, setImageUrl] = useState<string | null>(project.imageUrl || null);
 
     // Initialize selected users (excluding current user)
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>(
@@ -105,14 +106,11 @@ export function EditProjectModal({
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Image URL (Optional)</label>
-                        <input
-                            name="imageUrl"
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="https://..."
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
+                        <ImageUpload
+                            onImageSelected={setImageUrl}
+                            initialImage={project.imageUrl}
                         />
+                        <input type="hidden" name="imageUrl" value={imageUrl || ''} />
                     </div>
 
                     <div>

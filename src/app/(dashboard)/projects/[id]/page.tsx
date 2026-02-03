@@ -22,6 +22,7 @@ export default async function ProjectPage({
             tasks: {
                 orderBy: { createdAt: 'desc' }, // Newest first
             },
+            users: true,
         },
     });
 
@@ -38,12 +39,13 @@ export default async function ProjectPage({
             createdAt: t.createdAt.toISOString(),
             updatedAt: t.updatedAt.toISOString(),
             completedAt: t.completedAt ? t.completedAt.toISOString() : null,
+            isSoftDeleted: t.isSoftDeleted,
         })),
     };
 
     return (
         <div className="h-[calc(100vh-8rem)]">
-            <ProjectBoard project={serializableProject} tasks={serializableProject.tasks} />
+            <ProjectBoard project={serializableProject} tasks={serializableProject.tasks} currentUser={session.username as string} />
         </div>
     );
 }

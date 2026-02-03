@@ -31,7 +31,7 @@ export function Navbar({ session, users = [] }: NavbarProps) {
                                     {isAdmin ? (
                                         <span className="text-[10px] text-blue-600 font-bold tracking-widest uppercase mt-0.5">Admin</span>
                                     ) : (
-                                        <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">User</span>
+                                        <span className="text-[10px] text-blue-600 font-bold tracking-widest uppercase mt-0.5">User</span>
                                     )}
                                 </div>
                             </Link>

@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { createProject } from '@/app/actions';
+import { ImageUpload } from './ImageUpload';
 
 export function CreateProjectButton({ currentUser, users }: { currentUser: string, users: any[] }) {
     const [isCreating, setIsCreating] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     if (currentUser !== 'nkc') return null;
 
@@ -24,6 +26,7 @@ export function CreateProjectButton({ currentUser, users }: { currentUser: strin
         setSelectedUserIds([]);
         setName('');
         setDescription('');
+        setImageUrl(null);
     };
 
     return (
@@ -100,8 +103,8 @@ export function CreateProjectButton({ currentUser, users }: { currentUser: strin
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-1">Image URL (Optional)</label>
-                                <input name="imageUrl" className="w-full border rounded-lg p-2" placeholder="https://..." />
+                                <ImageUpload onImageSelected={setImageUrl} />
+                                <input type="hidden" name="imageUrl" value={imageUrl || ''} />
                             </div>
 
                             <div>
@@ -131,9 +134,10 @@ export function CreateProjectButton({ currentUser, users }: { currentUser: strin
                                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Create Project</button>
                             </div>
                         </form>
-                    </div>
-                </div>
-            )}
+                    </div >
+                </div >
+            )
+            }
         </>
     );
 }

@@ -135,41 +135,52 @@ export async function updateProject(formData: FormData) {
     const imageUrl = formData.get('imageUrl') as string;
     const userIdsStr = formData.get('userIds') as string;
 
-    if (!projectId || !name || !description) return;
-
-    let userIds: string[] = [];
-    if (userIdsStr) {
-        try {
-            userIds = JSON.parse(userIdsStr);
-        } catch (e) {
-            console.error("Failed to parse userIds", e);
-        }
+    if (!projectId || !name || !description) {
+        console.log('Missing fields:', { projectId, name, description });
+        return;
     }
 
-    // Connect creator AND selected users
-    // If the creator is not passed in userIds (which it won't be from the form), we must ensure they stay connected.
-    // Ideally, we should just set the users list to the new selection + current admin.
+    console.log(`Updating project ${projectId}:`, { name, description, userIdsLength: userIdsStr?.length, imageSize: imageUrl?.length });
 
-    // NOTE: This assumes 'nkc' (session.id) should always be part of the project.
-    // If we wanted to allow 'nkc' to remove themselves, we'd need different logic.
-    const usersToConnect = [
-        { id: session.id as string },
-        ...userIds.map(id => ({ id }))
-    ];
+    try {
 
-    await prisma.project.update({
-        where: { id: projectId },
-        data: {
-            name,
-            description,
-            imageUrl: imageUrl || null,
-            users: {
-                set: usersToConnect
+        let userIds: string[] = [];
+        if (userIdsStr) {
+            try {
+                userIds = JSON.parse(userIdsStr);
+            } catch (e) {
+                console.error("Failed to parse userIds", e);
             }
         }
-    });
 
-    revalidatePath('/');
+        // Connect creator AND selected users
+        // If the creator is not passed in userIds (which it won't be from the form), we must ensure they stay connected.
+        // Ideally, we should just set the users list to the new selection + current admin.
+
+        // NOTE: This assumes 'nkc' (session.id) should always be part of the project.
+        // If we wanted to allow 'nkc' to remove themselves, we'd need different logic.
+        const usersToConnect = [
+            { id: session.id as string },
+            ...userIds.map(id => ({ id }))
+        ];
+
+        await prisma.project.update({
+            where: { id: projectId },
+            data: {
+                name,
+                description,
+                imageUrl: imageUrl || null,
+                users: {
+                    set: usersToConnect
+                }
+            }
+        });
+
+        revalidatePath('/');
+    } catch (e) {
+        console.error("Error updating project:", e);
+        throw e;
+    }
 }
 
 export async function createUser(formData: FormData) {
