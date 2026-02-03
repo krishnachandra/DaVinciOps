@@ -94,11 +94,7 @@ export default async function DashboardPage() {
                 allUsers={allUsers}
             />
 
-            {projects.length === 0 && (
-                <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
-                    <p className="text-slate-500">No projects found for your account.</p>
-                </div>
-            )}
+
         </div>
     );
 }
